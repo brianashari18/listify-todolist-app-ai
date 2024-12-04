@@ -2,9 +2,13 @@ from flask import Flask, request, jsonify
 from googleapiclient.discovery import build
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
+from dotenv import load_dotenv
+import os
 
-api_key = 'AIzaSyDa96Mfv5aK_quXMdK7OBWx4mztGMKvi-I'
-cse_id = '941a1003b43d2486d'
+load_dotenv()
+
+API_KEY = os.getenv('API_KEY')
+CSE_ID = os.getenv('CSE_ID')
 
 app = Flask(__name__)
 
@@ -39,12 +43,13 @@ def calculate_cosine_similarity(query, search_results):
 
 @app.route('/api/ai-recommendation', methods=['GET'])
 def search():
+
     query = request.args.get('query', '')
 
     if not query:
         return jsonify({"error": "Query parameter is required!"}), 400
 
-    search_results = google_search(query, api_key, cse_id, 10)
+    search_results = google_search(query, API_KEY, CSE_ID, 10)
 
     if not search_results:
         return jsonify({"error": "No search results found!"}), 404
