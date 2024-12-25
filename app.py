@@ -43,7 +43,6 @@ def calculate_cosine_similarity(query, search_results):
 
 @app.route('/api/ai-recommendation', methods=['GET'])
 def search():
-
     query = request.args.get('query', '')
 
     if not query:
@@ -56,19 +55,31 @@ def search():
 
     cosine_sim = calculate_cosine_similarity(query, search_results)
 
-    if not cosine_sim:
+    if cosine_sim.size == 0:
         return jsonify({"error": "Unable to calculate similarity!"}), 500
 
     result = {
-        "code" : 200,
-        "status" : "OK",
+        "code": 200,
+        "status": "OK",
         "data": [
-            {"index": idx+1, "similarity": round(cosine_sim[idx], 4), "title": search_results[idx]['title'], "snippet": search_results[idx]['snippet'], "link": search_results[idx]['link']}
-            for idx in sorted(range(len(cosine_sim)), key=lambda i: cosine_sim[i], reverse=True)[:3]
+            {
+                "index": idx + 1,
+                "similarity": round(cosine_sim[idx], 4),
+                "title": search_results[idx]['title'],
+                "snippet": search_results[idx]['snippet'],
+                "link": search_results[idx]['link'],
+            }
+            for idx in sorted(
+                range(len(cosine_sim)),
+                key=lambda i: cosine_sim[i],
+                reverse=True,
+            )[:3]
         ]
     }
 
     return jsonify(result)
 
+
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='192.168.18.11', port=8080)
+
